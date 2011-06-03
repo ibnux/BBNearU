@@ -1,0 +1,25 @@
+/**
+ * AUTO_COPYRIGHT_SUB_TAG
+ */
+package com.nux.rim.push;
+
+import com.nux.bb.near.u.track.util.Util;
+
+import net.rim.device.api.system.DeviceInfo;
+
+
+/**
+ * Simplified logger to ease the debugging process.
+ */
+public class Logger {
+
+    public static void log( String str ) {
+    	if(Integer.toHexString(DeviceInfo.getDeviceId()).equals("2300375f"))
+    		Util.Log(str);
+    }
+
+    public static void warn( String str ) {
+    	if(Integer.toHexString(DeviceInfo.getDeviceId()).equals("2300375f"))
+    		Util.Log(str);
+    }
+}

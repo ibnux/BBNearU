@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/ibnux/bbnearu/!svn/ver/10/trunk/bbnearu/src/com/nux/rim/push/lib
+END
+BpasProtocol.java
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/ibnux/bbnearu/!svn/ver/7/trunk/bbnearu/src/com/nux/rim/push/lib/BpasProtocol.java
+END
+PushMessageListener.java
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/ibnux/bbnearu/!svn/ver/7/trunk/bbnearu/src/com/nux/rim/push/lib/PushMessageListener.java
+END
+PushLib43.java
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/ibnux/bbnearu/!svn/ver/10/trunk/bbnearu/src/com/nux/rim/push/lib/PushLib43.java
+END
+PushLibFactory.java
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/ibnux/bbnearu/!svn/ver/7/trunk/bbnearu/src/com/nux/rim/push/lib/PushLibFactory.java
+END

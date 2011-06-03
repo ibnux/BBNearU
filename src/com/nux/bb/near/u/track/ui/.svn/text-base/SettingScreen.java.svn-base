@@ -1,0 +1,259 @@
+package com.nux.bb.near.u.track.ui;
+
+import java.util.Vector;
+
+import net.rim.blackberry.api.homescreen.HomeScreen;
+import net.rim.device.api.system.DeviceInfo;
+import net.rim.device.api.system.EncodedImage;
+import net.rim.device.api.ui.Field;
+import net.rim.device.api.ui.FieldChangeListener;
+import net.rim.device.api.ui.Font;
+import net.rim.device.api.ui.FontFamily;
+import net.rim.device.api.ui.Graphics;
+import net.rim.device.api.ui.component.ButtonField;
+import net.rim.device.api.ui.component.CheckboxField;
+import net.rim.device.api.ui.component.Dialog;
+import net.rim.device.api.ui.component.EditField;
+import net.rim.device.api.ui.component.LabelField;
+import net.rim.device.api.ui.component.NumericChoiceField;
+import net.rim.device.api.ui.component.ObjectChoiceField;
+import net.rim.device.api.ui.component.SeparatorField;
+
+import com.nux.bb.near.u.track.field.LabelFieldBold;
+import com.nux.bb.near.u.track.field.ManagerField;
+import com.nux.bb.near.u.track.field.SpaceField;
+import com.nux.bb.near.u.track.field.WebBitmapField;
+import com.nux.bb.near.u.track.obj.DBStor;
+import com.nux.bb.near.u.track.obj.Maps;
+import com.nux.bb.near.u.track.obj.Setting;
+import com.nux.bb.near.u.track.util.HURLEncoder;
+import com.nux.bb.near.u.track.util.InetConn;
+import com.nux.bb.near.u.track.util.Layering;
+import com.nux.bb.near.u.track.util.Util;
+import com.nux.bb.near.u.track.util.WebDataCallback;
+import com.nux.rim.push.PersistentStorage;
+import com.nux.rim.push.PushConfig;
+import com.nux.rim.push.PushController;
+
+public class SettingScreen extends BaseScreen implements FieldChangeListener, WebDataCallback{
+	Setting set = DBStor.get_setting();
+	CheckboxField aktifkan = new CheckboxField("Activate Update Location",set.isAktif());
+	CheckboxField SetWall = new CheckboxField("Set Maps to Wallpaper",set.isSetWall());
+	CheckboxField actiRoom = new CheckboxField("Activate Chat Room",PersistentStorage.isRegistered());
+	CheckboxField Sound = new CheckboxField("Enable Sound",set.isSound());
+
+	String nicka = set.getNick();
+
+	EditField nick = new EditField("Nick Name: ",set.getNick(),10,EditField.NO_NEWLINE|EditField.FILTER_FILENAME);
+	EditField interval = new EditField("Update Interval (minutes) :  ",set.getInterval(),3,USE_ALL_WIDTH|EditField.NO_NEWLINE|EditField.FILTER_NUMERIC);
+	EditField FontSize = new EditField("Font Size :  ",set.getSizeFont()+"",2,USE_ALL_WIDTH|EditField.NO_NEWLINE|EditField.FILTER_NUMERIC);
+	LabelField testfont = new LabelField("ChatRoom Based Location");
+	String[] mapstype = {"roadmap","satellite","hybrid","terrain"};
+	NumericChoiceField zoom = new NumericChoiceField("Zoom", 0, 19, 1,set.getZoom());
+	ObjectChoiceField pilihmap = new ObjectChoiceField("Map Type", mapstype, set.getMapsType());
+	ButtonField testPush = new ButtonField("Test Push",ButtonField.CONSUME_CLICK|FIELD_HCENTER);
+	ButtonField cekUpdate = new ButtonField("Check For Updates",ButtonField.CONSUME_CLICK|FIELD_HCENTER);
+	WebBitmapField peta;
+
+	ButtonField test = new ButtonField("Test",FIELD_HCENTER|ButtonField.CONSUME_CLICK);
+	Vector trc;
+	private String url;
+	ManagerField mf1 = new ManagerField();
+	ManagerField mf2 = new ManagerField();
+	ManagerField mf3 = new ManagerField();
+	ManagerField mf4 = new ManagerField();
+	SettingScreen app;
+	public SettingScreen() {
+		setJudul("Setting");
+		this.app = this;
+		try{
+			FontFamily _fontFamily = FontFamily.forName("BBAlpha Serif");
+			Font font = _fontFamily.getFont(FontFamily.SCALABLE_FONT, DBStor.get_setting().getSizeFont()).derive(Font.ITALIC);
+			testfont.setFont(font);
+		}catch(Exception e){}
+
+		mf1.add(new LabelFieldBold("General",0x424242,FIELD_HCENTER));
+		mf1.add(aktifkan);
+		mf1.add(SetWall);
+		mf1.add(interval);
+		mf1.add(new SpaceField(8));
+
+		mf2.add(new LabelFieldBold("Room Chat",0x424242,FIELD_HCENTER));
+		mf2.add(actiRoom);
+		mf2.add(nick);
+		mf2.add(Sound);
+		mf2.add(FontSize);
+		mf2.add(testfont);
+		mf2.add(new SeparatorField());
+		mf2.add(testPush);
+		mf2.add(new SpaceField(8));
+
+		mf3.add(new LabelFieldBold("Maps",0x424242,FIELD_HCENTER));
+		mf3.add(pilihmap);
+		mf3.add(zoom);
+		mf3.add(new SpaceField(8));
+		Maps maps = new Maps();
+		maps.setHeight(200);
+		maps.setCoord(set.getLat(), set.getLon());
+		maps.setMapType(pilihmap.getSelectedIndex());
+		maps.setZoom(zoom.getSelectedValue());
+		this.peta = new WebBitmapField(maps.getUrlMaps(), FIELD_HCENTER);
+		mf4.add(new SpaceField(8));
+		mf4.add(peta);
+		mf4.add(test);
+		mf4.add(new SeparatorField());
+		mf4.add(cekUpdate);
+		mf4.add(new SpaceField(8));
+		/*FlowFieldManager ffm = new FlowFieldManager();
+		ffm.add(new LabelColor(">1000",Color.RED));
+		ffm.add(new LabelColor(">500",Color.BLUE));
+		ffm.add(new LabelColor(">100",Color.GREEN));
+		ffm.add(new LabelColor(">1",Color.YELLOW));*/
+
+		add(mf1);
+		add(new SpaceField(4));
+		add(mf2);
+		add(new SpaceField(4));
+		add(mf3);
+		add(new SpaceField(4));
+		add(mf4);
+		add(new SpaceField(4));
+
+		aktifkan.setPadding(0,5,0,5);
+		pilihmap.setPadding(0,5,0,5);
+		zoom.setPadding(0,5,0,5);
+		interval.setPadding(0,5,0,5);
+		nick.setPadding(0,5,0,5);
+		SetWall.setPadding(0,5,0,5);
+		actiRoom.setPadding(0,5,0,5);
+		Sound.setPadding(0,5,0,5);
+		FontSize.setPadding(0,5,0,5);
+		testfont.setPadding(0,5,0,5);
+
+		cekUpdate.setChangeListener(this);
+		FontSize.setChangeListener(this);
+		Sound.setChangeListener(this);
+		testPush.setChangeListener(this);
+		actiRoom.setChangeListener(this);
+		aktifkan.setChangeListener(this);
+		pilihmap.setChangeListener(this);
+		zoom.setChangeListener(this);
+		interval.setChangeListener(this);
+		test.setChangeListener(this);
+		nick.setChangeListener(this);
+		SetWall.setChangeListener(this);
+	}
+	public void fieldChanged(Field field, int context) {
+		if(field==actiRoom){
+			if(actiRoom.getChecked()){
+				Dialog.alert("This will activate Push. if failed, close and open again setting screen.");
+				PushController.register();
+			}else{
+				Dialog.alert("This will nonactivate Push. if failed, close and open again setting screen.");
+				PushController.unregister();
+			}
+			actiRoom.setEditable(false);
+		}else if(field==cekUpdate){
+			setShowLoader(true);
+			InetConn.getWebData("http://download.bbnearu.com/ver.txt", new WebDataCallback(){
+				public void callback(String data) {
+					app.setShowLoader(false);
+					if(!data.equals(Util.GetVer())){
+						if(Dialog.ask(Dialog.D_OK_CANCEL,"new version has been available,Download?")==Dialog.OK){
+							Util.BukaWeb("http://download.bbnearu.com/");
+						}
+					}else{
+						Dialog.alert("You are using the latest version");
+					}
+				}
+			});
+		}else if(field==testPush){
+			if(PersistentStorage.isRegistered()){
+				Dialog.alert("this will test Push Message. you will get notification if test success.");
+				InetConn.getWebData(PushConfig.getContentProviderUrl()+"/test.php?pin="+
+						Integer.toHexString(DeviceInfo.getDeviceId()), this);
+				testPush.setEditable(false);
+			}else{
+				Dialog.alert("Please activate Chat Room (Push Service)");
+			}
+		}else{
+			set.setAktif(aktifkan.getChecked());
+			set.setMapsType(pilihmap.getSelectedIndex());
+			set.setZoom(zoom.getSelectedValue());
+			set.setSound(Sound.getChecked());
+			String n = "10";
+			if(!FontSize.getText().equals("")){
+				n = FontSize.getText();
+			}
+			set.setSizeFont(Integer.parseInt(n));
+			try{
+				FontFamily _fontFamily = FontFamily.forName("BBAlpha Serif");
+				Font font = _fontFamily.getFont(FontFamily.SCALABLE_FONT, Integer.parseInt(n)).derive(Font.ITALIC);
+				testfont.setFont(font);
+			}catch(Exception e){}
+			n="0";
+			if(!interval.getText().equals("")){
+				n = interval.getText();
+			}
+			if(n.equals("0")){
+				set.setAktif(false);
+			}
+			set.setInterval(n);
+			if(nick.getText().length()>3){
+				set.setNick(HURLEncoder.pathEncode(nick.getText()));
+			}
+			set.setSetWall(SetWall.getChecked());
+			DBStor.set_setting(set);
+			Maps maps = new Maps();
+			if(field==test){
+				maps.setHeight(200);
+				maps.setMapType(pilihmap.getSelectedIndex());
+				maps.setZoom(zoom.getSelectedValue());
+				maps.setCoord(set.getLat(), set.getLon());
+				this.url = maps.getUrlMaps();
+				this.peta.reload(maps.getUrlMaps());
+			}
+		}
+	}
+	public void callback(String data) {
+		Util.Log(data);
+		if(data.startsWith("Exception")){
+			InetConn.getWebData(url, this);
+		}else if(data.startsWith("test")){
+
+		}else{
+			byte[] dataArray = data.getBytes();
+			EncodedImage bitmap = EncodedImage.createEncodedImage(dataArray, 0,
+					dataArray.length);
+			bitmap = Layering.setLayer(bitmap.getBitmap());
+			if(Util.tulisFile(Util.GetPath()+"maps.jpg", new String(bitmap.getData()))){
+				HomeScreen.setBackgroundImage(Util.GetPath()+"maps.jpg");
+			}else{
+				Dialog.alert("Failed to get maps");
+			}
+		}
+	}
+
+	final class LabelColor extends LabelField{
+		private int color = 0;
+		public LabelColor(String txt,int color) {
+			super(txt,FOCUSABLE);
+			this.color = color;
+		}
+		protected void drawFocus(Graphics arg0, boolean arg1) {}
+		protected void paint(Graphics g) {
+			g.setColor(this.color);
+			super.paint(g);
+		}
+	}
+
+	protected boolean onSavePrompt() {
+		if(!nicka.equals(DBStor.get_setting().getNick())){
+			String txt = nicka+" change nick to "+DBStor.get_setting().getNick()+".";
+			InetConn.PostWebData(Util.GetURLChat()+"broadcast.php?pin="+Integer.toHexString(DeviceInfo.getDeviceId())+"&nick="+DBStor.get_setting().getNick(),"txt="+txt, new WebDataCallback(){
+				public void callback(String data) {}
+			});
+		}
+		return true;
+	}
+}

@@ -1,0 +1,59 @@
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/ibnux/bbnearu/!svn/ver/13/trunk/bbnearu/src/com/nux/bb/near/u/track/ui
+END
+ChatScreen.java
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/ibnux/bbnearu/!svn/ver/13/trunk/bbnearu/src/com/nux/bb/near/u/track/ui/ChatScreen.java
+END
+addRoomChat.java
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/ibnux/bbnearu/!svn/ver/7/trunk/bbnearu/src/com/nux/bb/near/u/track/ui/addRoomChat.java
+END
+BaseScreen.java
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/ibnux/bbnearu/!svn/ver/13/trunk/bbnearu/src/com/nux/bb/near/u/track/ui/BaseScreen.java
+END
+BaseScreenChat.java
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/ibnux/bbnearu/!svn/ver/13/trunk/bbnearu/src/com/nux/bb/near/u/track/ui/BaseScreenChat.java
+END
+UserRoomScreen.java
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/ibnux/bbnearu/!svn/ver/13/trunk/bbnearu/src/com/nux/bb/near/u/track/ui/UserRoomScreen.java
+END
+PopupAgreement.java
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/ibnux/bbnearu/!svn/ver/13/trunk/bbnearu/src/com/nux/bb/near/u/track/ui/PopupAgreement.java
+END
+RoomScreen.java
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/ibnux/bbnearu/!svn/ver/13/trunk/bbnearu/src/com/nux/bb/near/u/track/ui/RoomScreen.java
+END
+MapScreen.java
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/ibnux/bbnearu/!svn/ver/6/trunk/bbnearu/src/com/nux/bb/near/u/track/ui/MapScreen.java
+END
+SettingScreen.java
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/ibnux/bbnearu/!svn/ver/13/trunk/bbnearu/src/com/nux/bb/near/u/track/ui/SettingScreen.java
+END

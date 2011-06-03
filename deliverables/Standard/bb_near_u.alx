@@ -1,0 +1,31 @@
+<loader version="1.0">
+	<application id="bb_near_u">
+		<name >
+			BlackBerry Near U
+		</name>
+		<description >
+			Look whos near you, and chat on nearest roomchat
+		</description>
+		<version >
+			1.0.18
+		</version>
+		<vendor >
+			iBNuX.net
+		</vendor>
+		<copyright >
+			Copyright (c) 2011 iBNuX.net
+		</copyright>
+		<fileset Java="1.49" _blackberryVersion="[5.0.0)">
+			<directory >
+				5.0.0
+			</directory>
+			<files >
+				bb_near_u.cod
+
+			</files>
+
+		</fileset>
+
+	</application>
+
+</loader>

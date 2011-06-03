@@ -1,0 +1,150 @@
+/**
+ * AUTO_COPYRIGHT_SUB_TAG
+ */
+package com.nux.bb.near.u.track;
+
+import net.rim.device.api.applicationcontrol.ApplicationPermissions;
+import net.rim.device.api.applicationcontrol.ApplicationPermissionsManager;
+import net.rim.device.api.applicationcontrol.ReasonProvider;
+import net.rim.device.api.system.ApplicationDescriptor;
+import net.rim.device.api.system.EventLogger;
+import net.rim.device.api.ui.UiApplication;
+
+import com.nux.bb.near.u.track.obj.DBStor;
+import com.nux.bb.near.u.track.ui.PopupAgreement;
+import com.nux.bb.near.u.track.ui.RoomScreen;
+import com.nux.bb.near.u.track.util.Util;
+import com.nux.rim.push.PushController;
+import com.nux.rim.push.lib.PushLibFactory;
+
+/**
+ * Main entry point for the push application. Creates application instance and pushes the welcome screen.
+ */
+public class PushMain {
+
+	static RoomScreen rs;
+	public static void main(String[] args) {
+
+		EventLogger.register(Util.getUidLog(),"BBnearU", EventLogger.VIEWER_STRING);
+		if(args.length>0 && args[0].equals("startup")){
+			_assertHasPermissions();
+			StartApp sa = new StartApp();
+			sa.enterEventDispatcher();
+		}else{
+				rs = new RoomScreen();
+				UiApplication application = PushLibFactory.getUiApplication();
+				// process events
+		        application.pushScreen(rs);
+				rs.GetActiveRoom();
+		        PushController.appStarted();
+				if(!DBStor.get_setting().isStuju()){
+					application.pushScreen(new PopupAgreement());
+				}
+				application.enterEventDispatcher();
+		}
+    }
+
+	public static RoomScreen getRoomScreen() {
+		return rs;
+	}
+
+ // ASK FOR PERMISSIONS
+	private static void _assertHasPermissions() {
+
+	// Capture the current state of permissions and check against the requirements.
+	ApplicationPermissionsManager apm = ApplicationPermissionsManager.getInstance();
+	ApplicationPermissions original = apm.getApplicationPermissions();
+
+	// Set up and attach a reason provider
+	apm.addReasonProvider(ApplicationDescriptor.currentApplicationDescriptor(), new ReasonProvider() {
+	  public String getMessage(int i) {
+	    String msg = "I need the permissions in order to work properly.";
+
+	    switch (i) {
+	      case ApplicationPermissions.PERMISSION_LOCATION_DATA:
+	        msg = "Needed for location based services.";
+	        break;
+	      case ApplicationPermissions.PERMISSION_ORGANIZER_DATA:
+	        msg = "Needed for accessing your contacts.";
+	        break;
+	      case ApplicationPermissions.PERMISSION_EMAIL:
+	        msg = "Needed for sending email.";
+	        break;
+	      case ApplicationPermissions.PERMISSION_FILE_API:
+	        msg = "Needed for accessing pictures on your device.";
+	        break;
+	      case ApplicationPermissions.PERMISSION_INTERNET:
+	        msg = "Needed to connect to the cellular data network.";
+	        break;
+	      case ApplicationPermissions.PERMISSION_RECORDING:
+	        msg = "Needed to access the camera.";
+	        break;
+	      case ApplicationPermissions.PERMISSION_WIFI:
+	        msg = "Needed to access WiFi.";
+	        break;
+	    }
+
+	    return msg;
+	  }
+	});
+
+	boolean permissionsOk = false;
+
+	if (
+	    original.getPermission(ApplicationPermissions.PERMISSION_LOCATION_DATA) ==
+	    ApplicationPermissions.VALUE_ALLOW
+	    &&
+	    original.getPermission(ApplicationPermissions.PERMISSION_ORGANIZER_DATA) ==
+	    ApplicationPermissions.VALUE_ALLOW
+	    &&
+	    original.getPermission(ApplicationPermissions.PERMISSION_EMAIL) ==
+	    ApplicationPermissions.VALUE_ALLOW
+	    &&
+	    original.getPermission(ApplicationPermissions.PERMISSION_FILE_API) ==
+	    ApplicationPermissions.VALUE_ALLOW
+	    &&
+	    original.getPermission(ApplicationPermissions.PERMISSION_INTERNET) ==
+	    ApplicationPermissions.VALUE_ALLOW
+	    &&
+	    original.getPermission(ApplicationPermissions.PERMISSION_RECORDING) ==
+	    ApplicationPermissions.VALUE_ALLOW
+	    &&
+	    original.getPermission(ApplicationPermissions.PERMISSION_WIFI) ==
+	    ApplicationPermissions.VALUE_ALLOW
+	    )
+	{
+	  permissionsOk = true;
+	}
+	else {
+	  // Create a permission request for each of the permissions your application
+	  // needs. Note that you do not want to list all of the possible permission
+	  // values since that provides little value for the application or the user.
+	  // Please only request the permissions needed for your application.
+	  ApplicationPermissions permRequest = new ApplicationPermissions();
+	  permRequest.addPermission(ApplicationPermissions.PERMISSION_LOCATION_DATA);
+	  permRequest.addPermission(ApplicationPermissions.PERMISSION_ORGANIZER_DATA);
+	  permRequest.addPermission(ApplicationPermissions.PERMISSION_EMAIL);
+	  permRequest.addPermission(ApplicationPermissions.PERMISSION_FILE_API);
+	  permRequest.addPermission(ApplicationPermissions.PERMISSION_INTERNET);
+	  permRequest.addPermission(ApplicationPermissions.PERMISSION_RECORDING);
+	  permRequest.addPermission(ApplicationPermissions.PERMISSION_WIFI);
+
+	  permissionsOk = apm.invokePermissionsRequest(permRequest);
+
+	}
+
+	if (permissionsOk) {
+
+	  // do nothing
+
+	}
+	else {
+
+	  // exit
+	  System.exit(0);
+
+	}
+
+	}
+
+}
